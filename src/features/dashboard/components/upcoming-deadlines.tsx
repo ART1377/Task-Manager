@@ -49,7 +49,7 @@ export function UpcomingDeadlines({ deadlines }: UpcomingDeadlinesProps) {
         <CardDescription>تسک‌های با موعد تحویل در ۷ روز آینده</CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="space-y-3">
+        <div className="max-h-80 space-y-3 overflow-y-auto">
           {deadlines.map((deadline) => (
             <div
               key={deadline.id}

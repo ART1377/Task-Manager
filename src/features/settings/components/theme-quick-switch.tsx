@@ -66,11 +66,6 @@ export function ThemeQuickSwitch() {
       </DropdownMenuTrigger>
 
       <DropdownMenuContent align="end" className="w-64 p-3" sideOffset={8}>
-        {/* Header - just title, no subtitle */}
-        <DropdownMenuLabel className="text-foreground px-1 py-0 text-xs font-medium">
-          ظاهر
-        </DropdownMenuLabel>
-
         {/* Mode Switcher */}
         <div className="bg-muted/50 my-2 flex gap-0.5 rounded-xl p-1">
           <button

@@ -3,11 +3,10 @@
 import { useAuth } from '@/features/auth/hooks/use-auth';
 import { NotificationBell } from '@/features/notifications/components/notification-bell';
 import { ThemeQuickSwitch } from '@/features/settings/components/theme-quick-switch';
-import { Avatar, AvatarFallback } from '@/shared/components/ui/avatar';
 import { Button } from '@/shared/components/ui/button';
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from '@/shared/components/ui/sheet';
 import { ROUTES } from '@/shared/lib/routes';
-import { cn, getInitials } from '@/shared/lib/utils';
+import { cn } from '@/shared/lib/utils';
 import {
   Bell,
   CheckSquare,
@@ -22,7 +21,7 @@ import {
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
-import { OnlineBadge } from './online-badge';
+import { UserDropdown } from './user-dropdown';
 
 const navigation = [
   { title: 'داشبورد', icon: LayoutDashboard, href: ROUTES.DASHBOARD },
@@ -59,23 +58,6 @@ export function MobileHeader() {
               <SheetTitle className="text-base font-bold">تسک منیجر</SheetTitle>
             </div>
           </div>
-          {/* User info */}
-          {user && (
-            <div className="flex items-center gap-3 border-b px-4 pt-3 pb-5">
-              <div className="relative">
-                <Avatar className="ring-border h-9 w-9 ring-2">
-                  <AvatarFallback className="bg-primary/10 text-primary text-xs font-medium">
-                    {getInitials(user.name || 'کاربر')}
-                  </AvatarFallback>
-                </Avatar>
-                <OnlineBadge isOnline={true} /> {/* always online for self */}
-              </div>
-              <div className="min-w-0 flex-1">
-                <p className="truncate text-sm font-medium">{user.name}</p>
-                <p className="text-muted-foreground truncate text-xs">{user.email}</p>
-              </div>
-            </div>
-          )}
 
           {/* Navigation */}
           <nav className="flex-1 space-y-1 p-3">
@@ -126,15 +108,7 @@ export function MobileHeader() {
       <div className="flex items-center gap-1">
         <ThemeQuickSwitch />
         <NotificationBell />
-
-        <div className="relative">
-          <Avatar className="ring-border h-8 w-8 ring-2">
-            <AvatarFallback className="bg-primary/10 text-primary text-[10px] font-medium">
-              {getInitials(user?.name || 'کاربر')}
-            </AvatarFallback>
-          </Avatar>
-          <OnlineBadge isOnline={true} /> {/* always online for self */}
-        </div>
+        <UserDropdown user={user ?? {}} />
       </div>
     </header>
   );

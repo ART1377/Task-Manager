@@ -43,12 +43,12 @@ async function main() {
     },
   });
 
-  // ─── Demo project (owned by admin) ───
-  const demoProject = await prisma.project.upsert({
-    where: { id: 'demo-project-id' },
+  // ─── Demo Project 1: Website Design ───
+  await prisma.project.upsert({
+    where: { id: 'demo-project-1' },
     update: {},
     create: {
-      id: 'demo-project-id',
+      id: 'demo-project-1',
       name: 'پروژه نمونه - طراحی وبسایت فروشگاهی',
       description:
         'این پروژه شامل طراحی، پیاده‌سازی و استقرار یک وبسایت فروشگاهی کامل است. از این پروژه برای نمایش قابلیت‌های سیستم استفاده می‌شود.',
@@ -142,11 +142,105 @@ async function main() {
     },
   });
 
+  // ─── Demo Project 2: Mobile App ───
+  await prisma.project.upsert({
+    where: { id: 'demo-project-2' },
+    update: {},
+    create: {
+      id: 'demo-project-2',
+      name: 'اپلیکیشن موبایل - باشگاه مشتریان',
+      description:
+        'طراحی و توسعه اپلیکیشن اندروید و iOS برای برنامه وفاداری مشتریان. شامل سیستم امتیازدهی، تخفیف‌ها، و اعلان‌های پوش‌نوتیفیکیشن.',
+      ownerId: admin.id,
+      members: {
+        create: [
+          { userId: admin.id, role: 'ADMIN' },
+          { userId: manager.id, role: 'MANAGER' },
+        ],
+      },
+      tasks: {
+        create: [
+          {
+            title: 'تحقیقات بازار و رقبا',
+            description: 'بررسی اپلیکیشن‌های مشابه در بازار ایران و جهان',
+            status: 'DONE',
+            priority: 'HIGH',
+            creatorId: admin.id,
+            assignees: { create: [{ userId: admin.id }] },
+          },
+          {
+            title: 'طراحی معماری سیستم امتیازدهی',
+            description: 'طراحی الگوریتم محاسبه امتیاز و سطوح مختلف کاربران',
+            status: 'DONE',
+            priority: 'HIGH',
+            creatorId: manager.id,
+            assignees: { create: [{ userId: manager.id }] },
+          },
+          {
+            title: 'طراحی رابط کاربری اپلیکیشن',
+            description: 'طراحی اسکرین‌های اصلی اپ با Figma - نسخه Android و iOS',
+            status: 'IN_PROGRESS',
+            priority: 'URGENT',
+            creatorId: manager.id,
+            dueDate: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000),
+            assignees: { create: [{ userId: manager.id }] },
+          },
+          {
+            title: 'پیاده‌سازی API سمت سرور',
+            description: 'REST API با Node.js و PostgreSQL برای backend اپ',
+            status: 'IN_PROGRESS',
+            priority: 'URGENT',
+            creatorId: admin.id,
+            assignees: { create: [{ userId: admin.id }] },
+          },
+          {
+            title: 'یکپارچه‌سازی پوش‌نوتیفیکیشن',
+            description: 'راه‌اندازی Firebase Cloud Messaging برای اندروید و APNs برای iOS',
+            status: 'TODO',
+            priority: 'HIGH',
+            creatorId: admin.id,
+            dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+            assignees: { create: [{ userId: admin.id }] },
+          },
+          {
+            title: 'تست امنیتی اپلیکیشن',
+            description: 'بررسی آسیب‌پذیری‌های امنیتی و تست نفوذ',
+            status: 'REVIEW',
+            priority: 'MEDIUM',
+            creatorId: manager.id,
+            assignees: { create: [{ userId: manager.id }] },
+          },
+          {
+            title: 'انتشار نسخه بتا در بازار',
+            description: 'آماده‌سازی و انتشار نسخه آزمایشی در مارکت‌های اندروید',
+            status: 'TODO',
+            priority: 'LOW',
+            creatorId: admin.id,
+            dueDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000),
+            assignees: { create: [{ userId: admin.id }] },
+          },
+        ],
+      },
+      chatRooms: {
+        create: {
+          name: 'چت تیم اپلیکیشن',
+          type: 'GROUP',
+          members: {
+            create: [{ userId: admin.id }, { userId: manager.id }],
+          },
+        },
+      },
+    },
+  });
+
   console.log('\n✅ Seed data created successfully!');
   console.log('\n📋 Demo Accounts:');
   console.log('   Admin:   admin@gmail.com   / Admin123   (مدیر سیستم)');
   console.log('   Manager: manager@gmail.com / Manager123 (مدیر پروژه)');
   console.log('   Member:  member@gmail.com  / Member123  (عضو تیم)');
+  console.log('\n📊 Demo Projects:');
+  console.log('   1. طراحی وبسایت فروشگاهی (8 tasks, 3 members)');
+  console.log('   2. اپلیکیشن موبایل - باشگاه مشتریان (7 tasks, 2 members)');
   console.log('\n🔗 Login: http://localhost:3000/login');
   console.log('   Click "ورود دمو" for instant access as Admin\n');
 }

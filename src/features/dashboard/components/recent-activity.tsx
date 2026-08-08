@@ -43,8 +43,8 @@ export function RecentActivity({ activities }: RecentActivityProps) {
         <CardTitle className="text-lg">فعالیت‌های اخیر</CardTitle>
         <CardDescription>آخرین تغییرات در پروژه‌ها</CardDescription>
       </CardHeader>
-      <CardContent>
-        <div className="max-h-80 space-y-5 overflow-y-auto">
+      <CardContent className="px-0">
+        <div className="max-h-80 space-y-5 overflow-y-auto px-6">
           {activities.map((activity) => (
             <div key={activity.id} className="flex items-start gap-3">
               <Avatar className="ring-border h-9 w-9 shrink-0 ring-2">

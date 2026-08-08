@@ -55,16 +55,18 @@ export function ProjectCard({ project, onEdit, onDeleteRequest, onInvite }: Proj
 
   return (
     <>
-      <Card className="card-hover group border-border/50 bg-card dark:border-border/30 dark:bg-card/80 dark:hover:border-border/50 relative border shadow-sm transition-all duration-300">
+      <Card className="card-hover group border-border/50 bg-card dark:border-border/30 dark:bg-card/80 dark:hover:border-border/50 relative flex h-full flex-col border shadow-sm transition-all duration-300">
         <div className="from-primary/5 pointer-events-none absolute inset-0 rounded-xl bg-linear-to-br via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
 
         <CardHeader className="flex flex-row items-start justify-between space-y-0 pb-2">
-          <div className="flex items-center gap-3">
-            <div className="bg-primary/10 flex h-12 w-12 items-center justify-center rounded-xl transition-transform duration-300 group-hover:scale-110">
-              <span className="text-primary text-lg font-bold">{getInitials(project.name)}</span>
+          <div className="flex min-w-0 items-center gap-3">
+            <div className="bg-primary/10 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl transition-transform duration-300 group-hover:scale-110 sm:h-12 sm:w-12">
+              <span className="text-primary text-base font-bold sm:text-lg">
+                {getInitials(project.name)}
+              </span>
             </div>
-            <div>
-              <h3 className="font-semibold tracking-tight">{project.name}</h3>
+            <div className="min-w-0">
+              <p className="line-clamp-2 leading-tight font-semibold">{project.name}</p>{' '}
               <p className="text-muted-foreground text-xs">{formatDate(project.createdAt)}</p>
             </div>
           </div>
@@ -76,13 +78,13 @@ export function ProjectCard({ project, onEdit, onDeleteRequest, onInvite }: Proj
           )}
         </CardHeader>
 
-        <CardContent>
-          <p className="text-muted-foreground/80 mb-4 line-clamp-2 text-sm">
+        <CardContent className="flex flex-1 flex-col">
+          <p className="text-muted-foreground/80 mb-4 line-clamp-2 min-h-10 text-sm">
             {project.description || 'بدون توضیحات'}
           </p>
-          <div className="flex items-center justify-between">
-            <div className="flex flex-wrap items-center gap-2">
-              {/* Clickable members badge with tooltip */}
+
+          <div className="mt-auto flex items-center justify-between">
+            <div className="flex flex-wrap items-center gap-1.5">
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
@@ -91,11 +93,11 @@ export function ProjectCard({ project, onEdit, onDeleteRequest, onInvite }: Proj
                         e.stopPropagation();
                         setMembersSheetOpen(true);
                       }}
-                      className="group/badge h-5.5 cursor-pointer! rounded-full transition-all hover:scale-105 active:scale-95"
+                      className="cursor-pointer! rounded-full transition-all hover:scale-105 active:scale-95"
                     >
                       <Badge
                         variant="secondary"
-                        className="group-hover/badge:bg-primary/10 group-hover/badge:text-primary group-hover:bg-primary/10 group-hover:text-primary gap-1 transition-colors"
+                        className="group-hover/badge:bg-primary/10 group-hover/badge:text-primary gap-1 transition-colors"
                       >
                         <Users className="h-3 w-3" /> {project._count?.members ?? 0} عضو
                       </Badge>
@@ -111,7 +113,6 @@ export function ProjectCard({ project, onEdit, onDeleteRequest, onInvite }: Proj
                 <CheckSquare className="h-3 w-3" /> {project._count?.tasks ?? 0} تسک
               </Badge>
 
-              {/* Role badge */}
               {userRole && (
                 <Badge
                   variant="outline"
@@ -130,7 +131,7 @@ export function ProjectCard({ project, onEdit, onDeleteRequest, onInvite }: Proj
               )}
             </div>
             {project.owner && (
-              <div className="relative">
+              <div className="relative shrink-0">
                 <Avatar className="ring-border h-7 w-7 ring-2">
                   <AvatarFallback className="text-[10px]">
                     {getInitials(project.owner.name)}

@@ -18,7 +18,7 @@ import type { Task } from '../types';
 
 interface TaskCardProps {
   task: Task;
-  project?: Project; // Pass project for permission checks
+  project?: Project;
   onDragStart: (task: Task) => void;
   onEdit?: (task: Task) => void;
   onDelete?: (taskId: string) => void;
@@ -38,7 +38,6 @@ export const TaskCard = memo(function TaskCard({
   const { user } = useAuth();
   const { isUserOnline } = usePresence();
 
-  // Consistent permission checks with "All Projects" fallback
   const userCanMove = (() => {
     if (!user) return false;
     if (!project) {
@@ -87,7 +86,6 @@ export const TaskCard = memo(function TaskCard({
   const handleGripDragStart = useCallback(
     (e: React.DragEvent) => {
       if (!userCanMove) {
-        // Changed from userCanEdit
         e.preventDefault();
         return;
       }
@@ -109,14 +107,14 @@ export const TaskCard = memo(function TaskCard({
       onKeyDown={(e) => {
         if (e.key === 'Enter' || e.key === ' ') handleCardClick();
       }}
-      className="card-hover group border-border/50 bg-card dark:border-border/30 dark:bg-card/80 dark:hover:border-border/50 focus:ring-ring focus:ring-offset-background relative cursor-pointer border shadow-sm transition-all duration-300 focus:ring-2 focus:ring-offset-2 focus:outline-none active:cursor-grabbing"
+      className="card-hover group border-border/50 bg-card dark:border-border/30 dark:bg-card/80 dark:hover:border-border/50 focus:ring-ring focus:ring-offset-background relative flex h-full flex-col border shadow-sm transition-all duration-300 focus:ring-2 focus:ring-offset-2 focus:outline-none active:cursor-grabbing"
     >
       <div className="from-primary/5 pointer-events-none absolute inset-0 rounded-xl bg-linear-to-br via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
 
-      <CardContent className="space-y-2 p-3">
+      <CardContent className="flex flex-1 flex-col space-y-2 px-3">
         {/* Header Row */}
         <div className="flex items-start gap-2">
-          {userCanMove && ( // Changed from userCanEdit
+          {userCanMove && (
             <div
               draggable
               onDragStart={handleGripDragStart}
@@ -126,9 +124,9 @@ export const TaskCard = memo(function TaskCard({
               <GripVertical className="text-muted-foreground/40 h-4 w-4 opacity-0 transition-opacity group-hover:opacity-100" />
             </div>
           )}
-          {!userCanMove && <div className="w-4 shrink-0" />} {/* Changed from userCanEdit */}
+          {!userCanMove && <div className="w-4 shrink-0" />}
           <div className="min-w-0 flex-1">
-            <p className="line-clamp-2 text-sm font-medium">{task.title}</p>
+            <p className="line-clamp-2 min-h-[2.5rem] text-sm font-medium">{task.title}</p>
           </div>
           {actions.length > 0 && (
             <div onClick={(e) => e.stopPropagation()}>
@@ -158,8 +156,8 @@ export const TaskCard = memo(function TaskCard({
           )}
         </div>
 
-        {/* Footer Row */}
-        <div className="border-border/40 flex items-center justify-between border-t pt-1.5">
+        {/* Footer Row — pushed to bottom */}
+        <div className="border-border/40 mt-auto! flex items-center justify-between border-t pt-1.5">
           <div className="text-muted-foreground/70 flex items-center gap-1 text-xs">
             <MessageSquare className="h-3 w-3" />
             {task._count?.comments ?? 0}

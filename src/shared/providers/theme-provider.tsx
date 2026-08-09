@@ -6,10 +6,11 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   return (
     <NextThemesProvider
       attribute="class"
-      defaultTheme="system"
-      enableSystem
+      defaultTheme="purple-light"
+      enableSystem={false}
       enableColorScheme
       disableTransitionOnChange
+      storageKey="task-manager-theme"
       themes={[
         'light',
         'dark',

@@ -126,7 +126,7 @@ export const TaskCard = memo(function TaskCard({
           )}
           {!userCanMove && <div className="w-4 shrink-0" />}
           <div className="min-w-0 flex-1">
-            <p className="line-clamp-2 min-h-[2.5rem] text-sm font-medium">{task.title}</p>
+            <p className="line-clamp-2 min-h-10 text-sm font-medium">{task.title}</p>
           </div>
           {actions.length > 0 && (
             <div onClick={(e) => e.stopPropagation()}>

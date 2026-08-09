@@ -120,6 +120,34 @@ export function canManageMessage(
   return isSystemAdmin(user) || messageSenderId === user.id;
 }
 
+/**
+ * Check if user can remove a specific member from the project.
+ * Owner can remove anyone. Admin can remove members/managers (not owner or other admins).
+ */
+export function canRemoveMember(
+  user: UserData | null | undefined,
+  project: Project,
+  targetMember: { userId: string; role: string }
+): boolean {
+  if (!user) return false;
+  if (isSystemAdmin(user)) return true;
+
+  // Owner can remove anyone except themselves
+  if (project.ownerId === user.id) {
+    return targetMember.userId !== user.id;
+  }
+
+  // Admin can remove members and managers (not owner, not other admins)
+  const userRole = getProjectRole(user.id, project.members);
+  if (userRole === 'ADMIN') {
+    if (targetMember.userId === project.ownerId) return false; // Can't remove owner
+    if (targetMember.role === 'ADMIN') return false; // Can't remove other admins
+    return targetMember.userId !== user.id; // Can't remove self
+  }
+
+  return false;
+}
+
 // ── Labels & variants (consistent across the app) ──
 export const ROLE_LABELS: Record<string, string> = {
   OWNER: 'مالک',

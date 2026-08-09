@@ -121,12 +121,15 @@ export const TaskCard = memo(function TaskCard({
               onClick={(e) => e.stopPropagation()}
               className="shrink-0 cursor-grab active:cursor-grabbing"
             >
-              <GripVertical className="text-muted-foreground/40 h-4 w-4 opacity-0 transition-opacity group-hover:opacity-100" />
+              <GripVertical className="text-muted-foreground/40 h-4 w-4" />
             </div>
           )}
           {!userCanMove && <div className="w-4 shrink-0" />}
           <div className="min-w-0 flex-1">
-            <p className="line-clamp-2 min-h-10 text-sm font-medium">{task.title}</p>
+            <p className="line-clamp-2 text-sm font-medium">{task.title}</p>
+            <p className="text-muted-foreground/60 mt-0.5 truncate text-[10px]">
+              {task?.project?.name}
+            </p>
           </div>
           {actions.length > 0 && (
             <div onClick={(e) => e.stopPropagation()}>

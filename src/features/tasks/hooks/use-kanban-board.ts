@@ -1,5 +1,6 @@
 'use client';
 
+import { useAuth } from '@/features/auth/hooks/use-auth';
 import { useProjects } from '@/features/projects/hooks/use-projects';
 import { useQueryState } from 'nuqs';
 import { useCallback, useMemo, useState } from 'react';
@@ -9,15 +10,19 @@ import { useTasks } from './use-tasks';
 
 export function useKanbanBoard() {
   const { projects } = useProjects();
+  const { user } = useAuth();
+  const currentUserId = user?.id;
 
-  // ── URL‑based search ──
+  // ── URL‑based filters ──
   const [searchQuery, setSearchQuery] = useQueryState('q', { defaultValue: '' });
+  const [selectedProjectId, setSelectedProjectId] = useQueryState('project', {
+    defaultValue: 'all',
+  });
+  const [priorityFilter, setPriorityFilter] = useQueryState('priority', { defaultValue: 'all' });
+  const [assigneeFilter, setAssigneeFilter] = useQueryState('assignee', { defaultValue: 'all' });
+  const [combinedSort, setCombinedSort] = useQueryState('sort', { defaultValue: 'createdAt_desc' });
 
-  // ── Local UI state ──
-  const [selectedProjectId, setSelectedProjectId] = useState<string>('all');
-  const [priorityFilter, setPriorityFilter] = useState<string>('all');
-  const [assigneeFilter, setAssigneeFilter] = useState<string>('all');
-  const [combinedSort, setCombinedSort] = useState<string>('createdAt_desc');
+  // ── Local UI state (not in URL) ──
   const [viewMode, setViewMode] = useState<'kanban' | 'list'>('kanban');
 
   // ── Derived sort values ──
@@ -111,7 +116,7 @@ export function useKanbanBoard() {
     setAssigneeFilter('all');
     setCombinedSort('createdAt_desc');
     setSearchQuery(null);
-  }, []);
+  }, [setSelectedProjectId, setPriorityFilter, setAssigneeFilter, setCombinedSort, setSearchQuery]);
 
   const hasNoTasks = tasks.length === 0;
 
@@ -126,7 +131,7 @@ export function useKanbanBoard() {
     projects,
     searchQuery,
 
-    // filters state + setters
+    // filters state + setters (all URL-based)
     selectedProjectId,
     setSelectedProjectId,
     priorityFilter,

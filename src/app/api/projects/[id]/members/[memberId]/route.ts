@@ -83,13 +83,11 @@ export async function DELETE(
 
     const { id: projectId, memberId } = await params;
 
+    // Get project with members for permission check
     const project = await prisma.project.findUnique({
       where: { id: projectId },
       include: {
-        members: {
-          where: { userId: session.user.id },
-          select: { role: true },
-        },
+        members: true,
       },
     });
 
@@ -97,27 +95,59 @@ export async function DELETE(
       return NextResponse.json({ error: 'پروژه یافت نشد' }, { status: 404 });
     }
 
-    const isOwner = project.ownerId === session.user.id;
-    const isAdmin = project.members.some((m) => m.role === 'ADMIN');
-
-    if (!isOwner && !isAdmin) {
-      return NextResponse.json({ error: 'شما اجازه حذف اعضا را ندارید' }, { status: 403 });
-    }
-
-    const member = await prisma.projectMember.findUnique({
+    // Get the target member
+    const targetMember = await prisma.projectMember.findUnique({
       where: { id: memberId },
-      select: { userId: true },
     });
 
-    if (!member) {
+    if (!targetMember) {
       return NextResponse.json({ error: 'عضو یافت نشد' }, { status: 404 });
     }
 
-    if (member.userId === project.ownerId) {
+    // Permission: Only owner or admin can remove
+    const isOwner = project.ownerId === session.user.id;
+    const currentUserMember = project.members.find((m) => m.userId === session.user.id);
+    const isAdmin = currentUserMember?.role === 'ADMIN';
+    const isSystemAdmin = session.user.role === 'ADMIN';
+
+    if (!isSystemAdmin && !isOwner && !isAdmin) {
+      return NextResponse.json({ error: 'شما اجازه حذف اعضا را ندارید' }, { status: 403 });
+    }
+
+    // Owner can't be removed
+    if (targetMember.userId === project.ownerId) {
       return NextResponse.json({ error: 'مالک پروژه را نمی‌توان حذف کرد' }, { status: 400 });
     }
 
-    await prisma.projectMember.delete({ where: { id: memberId } });
+    // Admin can't remove other admins
+    if (isAdmin && !isOwner && targetMember.role === 'ADMIN') {
+      return NextResponse.json(
+        { error: 'شما نمی‌توانید مدیران دیگر را حذف کنید' },
+        { status: 403 }
+      );
+    }
+
+    // Can't remove yourself
+    if (targetMember.userId === session.user.id) {
+      return NextResponse.json({ error: 'نمی‌توانید خودتان را حذف کنید' }, { status: 400 });
+    }
+
+    // Also remove from chat rooms
+    const chatRooms = await prisma.chatRoom.findMany({
+      where: { projectId },
+      select: { id: true },
+    });
+
+    await prisma.$transaction([
+      // Remove from project
+      prisma.projectMember.delete({ where: { id: memberId } }),
+      // Remove from all project chat rooms
+      ...chatRooms.map((room) =>
+        prisma.chatRoomMember.deleteMany({
+          where: { roomId: room.id, userId: targetMember.userId },
+        })
+      ),
+    ]);
 
     return NextResponse.json({ success: true });
   } catch (error) {

@@ -1,5 +1,6 @@
 'use client';
 
+import { useAuth } from '@/features/auth/hooks/use-auth';
 import { useProjects } from '@/features/projects/hooks/use-projects';
 import { DialogHeaderWithIcon } from '@/shared/components/dialog-header-with-icon';
 import { Badge } from '@/shared/components/ui/badge';
@@ -33,6 +34,7 @@ import {
 } from '@/shared/components/ui/select';
 import { SubmitButton } from '@/shared/components/ui/submit-button';
 import { Textarea } from '@/shared/components/ui/textarea';
+import { canCreateTask } from '@/shared/lib/permissions';
 import { cn } from '@/shared/lib/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Check, CheckSquare, ChevronsUpDown, Pencil, Plus, X } from 'lucide-react';
@@ -53,6 +55,8 @@ interface TaskDialogProps {
 export function TaskDialog({ task, open, onOpenChange, trigger }: TaskDialogProps) {
   const { createTask, isCreating, updateTask, isUpdating } = useTasks();
   const { projects } = useProjects();
+  const { user } = useAuth();
+
   const [assigneePopoverOpen, setAssigneePopoverOpen] = useState(false);
 
   const isEditing = !!task;
@@ -127,6 +131,12 @@ export function TaskDialog({ task, open, onOpenChange, trigger }: TaskDialogProp
 
   const selectedMembers = members.filter((m) => selectedAssigneeIds.includes(m.user.id));
 
+  // Filter projects where user can create tasks
+  const availableProjects = projects.filter((p) => {
+    if (!user) return false;
+    return canCreateTask(user, p);
+  });
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       {trigger && <DialogTrigger asChild>{trigger}</DialogTrigger>}
@@ -155,16 +165,46 @@ export function TaskDialog({ task, open, onOpenChange, trigger }: TaskDialogProp
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        {projects.length === 0 ? (
+                        {availableProjects.length === 0 ? (
                           <div className="text-muted-foreground px-2 py-4 text-center text-sm">
-                            ابتدا یک پروژه بسازید
+                            شما اجازه ایجاد تسک در هیچ پروژه‌ای را ندارید
                           </div>
                         ) : (
-                          projects.map((p) => (
-                            <SelectItem key={p.id} value={p.id}>
-                              {p.name}
-                            </SelectItem>
-                          ))
+                          availableProjects.map((p) => {
+                            const memberRole = p.members?.find((m) => m.userId === user?.id)?.role;
+                            const isOwner = p.ownerId === user?.id;
+                            return (
+                              <SelectItem key={p.id} value={p.id}>
+                                <span className="flex items-center gap-2">
+                                  <span>{p.name}</span>
+                                  {isOwner && (
+                                    <Badge
+                                      variant="outline"
+                                      className="border-amber-500/50 text-[9px] text-amber-500"
+                                    >
+                                      مالک
+                                    </Badge>
+                                  )}
+                                  {!isOwner && memberRole === 'ADMIN' && (
+                                    <Badge
+                                      variant="outline"
+                                      className="border-primary/50 text-primary text-[9px]"
+                                    >
+                                      مدیر
+                                    </Badge>
+                                  )}
+                                  {!isOwner && memberRole === 'MANAGER' && (
+                                    <Badge
+                                      variant="outline"
+                                      className="border-blue-500/50 text-[9px] text-blue-500"
+                                    >
+                                      مدیر پروژه
+                                    </Badge>
+                                  )}
+                                </span>
+                              </SelectItem>
+                            );
+                          })
                         )}
                       </SelectContent>
                     </Select>

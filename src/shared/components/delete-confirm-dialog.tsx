@@ -29,7 +29,7 @@ export function DeleteConfirmDialog({
   isDeleting,
 }: DeleteConfirmDialogProps) {
   return (
-    <AlertDialog open={open} onOpenChange={onOpenChange}>
+    <AlertDialog open={open} onOpenChange={isDeleting ? undefined : onOpenChange}>
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>{title}</AlertDialogTitle>
@@ -38,7 +38,10 @@ export function DeleteConfirmDialog({
         <AlertDialogFooter className="gap-2">
           <AlertDialogCancel disabled={isDeleting}>انصراف</AlertDialogCancel>
           <AlertDialogAction
-            onClick={onConfirm}
+            onClick={(e) => {
+              e.preventDefault();
+              onConfirm();
+            }}
             disabled={isDeleting}
             className="bg-destructive hover:bg-destructive/90"
           >

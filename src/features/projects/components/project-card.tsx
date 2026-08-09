@@ -97,7 +97,7 @@ export function ProjectCard({ project, onEdit, onDeleteRequest, onInvite }: Proj
                     >
                       <Badge
                         variant="secondary"
-                        className="group-hover/badge:bg-primary/10 group-hover/badge:text-primary gap-1 transition-colors"
+                        className="group-hover:bg-primary/10 group-hover:text-primary gap-1 transition-colors"
                       >
                         <Users className="h-3 w-3" /> {project._count?.members ?? 0} عضو
                       </Badge>

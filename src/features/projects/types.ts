@@ -40,3 +40,10 @@ export interface UpdateProjectInput {
   name?: string;
   description?: string;
 }
+
+export interface SearchUser {
+  id: string;
+  name: string;
+  email: string;
+  avatar: string | null;
+}

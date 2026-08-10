@@ -23,21 +23,21 @@ export function useTasks(filters: UseTasksFilters = {}) {
   const tasksQuery = useQuery({
     queryKey: projectId
       ? queryKeys.tasks.byProject(projectId, restFilters)
-      : queryKeys.tasks.all(restFilters),
+      : queryKeys.tasks.list(restFilters),
     queryFn: () => tasksApi.getAll(filters),
   });
 
   // Mutations should invalidate all task queries, regardless of filters
   const createTaskMutation = useMutationWithToast({
     mutationFn: tasksApi.create,
-    queryKey: ['tasks'], // Broad invalidation
+    queryKey: queryKeys.tasks.all,
     successMessage: 'تسک با موفقیت ایجاد شد',
     errorMessage: 'خطا در ایجاد تسک',
   });
 
   const updateTaskMutation = useOptimisticMutation<Task, { id: string; data: UpdateTaskInput }>({
     mutationFn: ({ id, data }) => tasksApi.update(id, data),
-    queryKey: ['tasks'], // Broad invalidation
+    queryKey: queryKeys.tasks.all,
     successMessage: 'تسک به‌روزرسانی شد',
     errorMessage: 'خطا در به‌روزرسانی تسک',
     onOptimisticUpdate: (oldData, { id, data }) => {
@@ -48,7 +48,7 @@ export function useTasks(filters: UseTasksFilters = {}) {
 
   const deleteTaskMutation = useMutationWithToast({
     mutationFn: tasksApi.delete,
-    queryKey: ['tasks'], // Broad invalidation
+    queryKey: queryKeys.tasks.all,
     successMessage: 'تسک حذف شد',
     errorMessage: 'خطا در حذف تسک',
   });

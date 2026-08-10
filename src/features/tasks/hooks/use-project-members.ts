@@ -1,6 +1,7 @@
 'use client';
 
 import { apiClient } from '@/shared/config/axios';
+import { queryKeys } from '@/shared/lib/query-keys';
 import { useQuery } from '@tanstack/react-query';
 
 interface Member {
@@ -11,7 +12,7 @@ interface Member {
 
 export function useProjectMembers(projectId: string | undefined) {
   return useQuery({
-    queryKey: ['projects', projectId, 'members'],
+    queryKey: queryKeys.projects.members(projectId || ''),
     queryFn: async () => {
       if (!projectId) return [];
       const res = await apiClient.get<Member[]>(`/projects/${projectId}/members`);

@@ -55,8 +55,8 @@ export function InviteMemberDialog({
       <DialogContent className="sm:max-w-100">
         <DialogHeaderWithIcon
           icon={UserPlus}
-          title={`دعوت عضو به ${projectName}`}
-          description="ایمیل کاربر مورد نظر را وارد کنید"
+          title="دعوت عضو جدید"
+          description={`پروژه: ${projectName}`}
         />
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 pt-4">

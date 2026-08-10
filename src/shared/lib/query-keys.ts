@@ -7,17 +7,21 @@ export const queryKeys = {
   projects: {
     all: ['projects'] as const,
     byId: (id: string) => ['projects', id] as const,
+    list: (filters?: Record<string, string | undefined>) =>
+      ['projects', 'list', filters ?? {}] as const,
     members: (projectId: string) => ['projects', projectId, 'members'] as const,
   },
   tasks: {
-    all: (filters?: Record<string, string | undefined>) =>
-      ['tasks', 'list', filters ?? {}] as const,
+    all: ['tasks'] as const,
     byId: (id: string) => ['tasks', 'detail', id] as const,
+    list: (filters?: Record<string, string | undefined>) =>
+      ['tasks', 'list', filters ?? {}] as const,
     byProject: (projectId: string, filters?: Record<string, string | undefined>) =>
       ['tasks', 'project', projectId, filters ?? {}] as const,
     comments: (taskId: string) => ['tasks', taskId, 'comments'] as const,
   },
   chat: {
+    all: ['chat'] as const,
     rooms: (projectId: string) => ['chat', 'rooms', projectId] as const,
     messages: (roomId: string) => ['chat', 'messages', roomId] as const,
   },

@@ -6,8 +6,6 @@ interface OptimisticUpdateConfig<TData, TVariables> {
   queryKey: QueryKey;
   successMessage?: string;
   errorMessage?: string;
-
-  // Update function: gets current cache + variables, returns new cache
   onOptimisticUpdate?: (oldData: TData[] | undefined, variables: TVariables) => TData[];
 }
 
@@ -24,19 +22,28 @@ export function useOptimisticMutation<TData = unknown, TVariables = unknown>({
     mutationFn,
 
     onMutate: async (variables) => {
+      // Cancel all queries matching this key pattern
       await queryClient.cancelQueries({ queryKey });
-      const previousData = queryClient.getQueryData<TData[]>(queryKey);
+
+      // Store previous data for rollback
+      const previousData = queryClient.getQueriesData<TData[]>({ queryKey, exact: false });
 
       if (onOptimisticUpdate) {
-        queryClient.setQueryData<TData[]>(queryKey, (old) => onOptimisticUpdate(old, variables));
+        // Update all matching caches
+        queryClient.setQueriesData<TData[]>({ queryKey, exact: false }, (old) =>
+          onOptimisticUpdate(old, variables)
+        );
       }
 
       return { previousData };
     },
 
     onError: (err, variables, context) => {
+      // Rollback all matching caches
       if (context?.previousData) {
-        queryClient.setQueryData(queryKey, context.previousData);
+        for (const [key, data] of context.previousData) {
+          queryClient.setQueryData(key, data);
+        }
       }
       toast.error(errorMessage);
     },
@@ -48,7 +55,7 @@ export function useOptimisticMutation<TData = unknown, TVariables = unknown>({
     },
 
     onSettled: () => {
-      queryClient.invalidateQueries({ queryKey });
+      queryClient.invalidateQueries({ queryKey, exact: false });
     },
   });
 }

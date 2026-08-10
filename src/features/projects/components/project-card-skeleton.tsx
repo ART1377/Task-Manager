@@ -21,6 +21,7 @@ export function ProjectCardSkeleton() {
           <div className="flex items-center gap-2">
             <Skeleton className="h-6 w-16 rounded-full" />
             <Skeleton className="h-6 w-16 rounded-full" />
+            <Skeleton className="h-6 w-16 rounded-full" />
           </div>
           <Skeleton className="h-7 w-7 rounded-full" />
         </div>

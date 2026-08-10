@@ -1,5 +1,6 @@
 'use client';
 
+import { queryKeys } from '@/shared/lib/query-keys';
 import { useQueryClient } from '@tanstack/react-query';
 import { useSession } from 'next-auth/react';
 import Pusher from 'pusher-js';
@@ -24,7 +25,7 @@ export function useGlobalCommentListener() {
 
     const handleComment = (data: { taskId: string; comment: TaskComment }) => {
       // Update comment count on the task card across all task queries
-      queryClient.setQueriesData<Task[]>({ queryKey: ['tasks'], exact: false }, (old) => {
+      queryClient.setQueriesData<Task[]>({ queryKey: queryKeys.tasks.all, exact: false }, (old) => {
         if (!old) return old;
         return old.map((task) =>
           task.id === data.taskId

@@ -12,8 +12,10 @@ import {
   TooltipTrigger,
 } from '@/shared/components/ui/tooltip';
 import { canDeleteProject, canManageProject, ROLE_LABELS } from '@/shared/lib/permissions';
+import { ROUTES } from '@/shared/lib/routes';
 import { cn, formatDate, getInitials } from '@/shared/lib/utils';
 import { CheckSquare, Pencil, Trash2, UserPlus, Users } from 'lucide-react';
+import Link from 'next/link';
 import { useState } from 'react';
 import type { Project } from '../types';
 import { ProjectMembersSheet } from './project-members-sheet';
@@ -93,7 +95,7 @@ export function ProjectCard({ project, onEdit, onDeleteRequest, onInvite }: Proj
                         e.stopPropagation();
                         setMembersSheetOpen(true);
                       }}
-                      className="cursor-pointer! rounded-full transition-all hover:scale-105 active:scale-95"
+                      className="h-5.5 cursor-pointer! rounded-full transition-all hover:scale-105 active:scale-95"
                     >
                       <Badge
                         variant="secondary"
@@ -109,15 +111,24 @@ export function ProjectCard({ project, onEdit, onDeleteRequest, onInvite }: Proj
                 </Tooltip>
               </TooltipProvider>
 
-              <Badge variant="secondary" className="gap-1">
-                <CheckSquare className="h-3 w-3" /> {project._count?.tasks ?? 0} تسک
-              </Badge>
+              <Link
+                href={`${ROUTES.TASKS}?project=${project.id}`}
+                onClick={(e) => e.stopPropagation()}
+                className="h-5.5 cursor-pointer! rounded-full transition-all hover:scale-105 active:scale-95"
+              >
+                <Badge
+                  variant="secondary"
+                  className="hover:bg-primary/10 group-hover:bg-primary/10 group-hover:text-primary hover:text-primary gap-1 transition-colors"
+                >
+                  <CheckSquare className="h-3 w-3" /> {project._count?.tasks ?? 0} تسک
+                </Badge>
+              </Link>
 
               {userRole && (
                 <Badge
                   variant="outline"
                   className={cn(
-                    'text-[10px]',
+                    'text-[11px]',
                     userRole === 'ADMIN' && 'border-primary/50 text-primary',
                     userRole === 'MANAGER' && 'border-blue-500/50 text-blue-500'
                   )}

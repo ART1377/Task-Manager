@@ -308,7 +308,7 @@ export function useCreateChatRoom() {
   return useMutationWithToast({
     mutationFn: ({ projectId, name }: { projectId: string; name: string }) =>
       chatApi.createRoom(projectId, name),
-    queryKey: ['chat'],
+    queryKey: queryKeys.chat.all,
     successMessage: 'چت روم با موفقیت ایجاد شد',
     errorMessage: 'خطا در ایجاد چت روم',
   });

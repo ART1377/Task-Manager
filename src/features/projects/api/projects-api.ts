@@ -44,4 +44,11 @@ export const projectsApi = {
     const response = await apiClient.delete(`/projects/${projectId}/members/${memberId}`);
     return response.data;
   },
+
+  getAllUsers: async (): Promise<
+    { id: string; name: string; email: string; avatar: string | null }[]
+  > => {
+    const response = await apiClient.get('/users');
+    return response.data;
+  },
 };

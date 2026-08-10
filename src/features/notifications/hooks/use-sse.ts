@@ -31,7 +31,6 @@ export function useSSE() {
 
     es.onmessage = (event) => {
       try {
-        // Ignore heartbeats
         if (!event.data || event.data.startsWith(':')) return;
 
         const data: SSENotificationEvent = JSON.parse(event.data);
@@ -43,16 +42,53 @@ export function useSSE() {
             duration: 5000,
           });
 
-          // Invalidate notifications cache
-          queryClient.invalidateQueries({
-            queryKey: queryKeys.notifications.all,
-          });
-          queryClient.invalidateQueries({
-            queryKey: queryKeys.notifications.unread,
+          // Directly update the notifications cache instead of just invalidating
+          queryClient.setQueryData<{
+            notifications: Array<{
+              id: string;
+              title: string;
+              message: string;
+              type: string;
+              isRead: boolean;
+              createdAt: string;
+            }>;
+            unreadCount: number;
+          }>(queryKeys.notifications.all, (old) => {
+            if (!old) {
+              return {
+                notifications: [
+                  {
+                    id: `sse-${Date.now()}`,
+                    title: data.notification.title,
+                    message: data.notification.message,
+                    type: data.notification.type,
+                    isRead: false,
+                    createdAt: data.notification.createdAt,
+                  },
+                ],
+                unreadCount: 1,
+              };
+            }
+
+            return {
+              ...old,
+              notifications: [
+                {
+                  id: `sse-${Date.now()}`,
+                  title: data.notification.title,
+                  message: data.notification.message,
+                  type: data.notification.type,
+                  isRead: false,
+                  createdAt: data.notification.createdAt,
+                },
+                ...old.notifications,
+              ].slice(0, 50), // Keep max 50
+              unreadCount: old.unreadCount + 1,
+            };
           });
         }
       } catch {
-        // Ignore parse errors (heartbeats, etc.)
+        // Ignore parse errors
       }
     };
 
@@ -60,7 +96,6 @@ export function useSSE() {
       es.close();
       eventSourceRef.current = null;
 
-      // Auto-reconnect after 3 seconds
       reconnectTimeoutRef.current = setTimeout(() => {
         connect();
       }, 3000);

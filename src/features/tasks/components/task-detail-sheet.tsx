@@ -19,7 +19,7 @@ interface TaskDetailSheetProps {
   task: Task;
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  currentUserId?: string; // NEW: pass current user ID
+  currentUserId?: string;
 }
 
 export function TaskDetailSheet({ task, open, onOpenChange, currentUserId }: TaskDetailSheetProps) {
@@ -138,7 +138,7 @@ export function TaskDetailSheet({ task, open, onOpenChange, currentUserId }: Tas
                             : 'bg-muted rounded-tl-md'
                         )}
                       >
-                        <p className="break-words whitespace-pre-wrap">{comment.content}</p>
+                        <p className="wrap-break-word whitespace-pre-wrap">{comment.content}</p>
                       </div>
                     </div>
                   </div>

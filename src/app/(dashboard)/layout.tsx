@@ -1,5 +1,4 @@
 import { auth } from '@/features/auth/auth-config';
-import { SSEProvider } from '@/features/notifications/components/sse-provider';
 import { AppHeader } from '@/shared/components/app-header';
 import { AppSidebar } from '@/shared/components/app-sidebar';
 import { BottomNav } from '@/shared/components/bottom-nav';
@@ -16,25 +15,23 @@ export default async function DashboardLayout({ children }: { children: React.Re
 
   return (
     <SidebarProvider>
-      <SSEProvider>
+      <div className="hidden md:block">
+        <AppSidebar />
+      </div>
+
+      <SidebarInset>
         <div className="hidden md:block">
-          <AppSidebar />
+          <AppHeader user={session.user} />
         </div>
 
-        <SidebarInset>
-          <div className="hidden md:block">
-            <AppHeader user={session.user} />
-          </div>
+        <MobileHeader />
 
-          <MobileHeader />
+        <main className="bg-muted/10 flex-1 overflow-y-auto p-3 pb-20 md:p-6 md:pb-6">
+          <PageTransition>{children}</PageTransition>
+        </main>
 
-          <main className="bg-muted/10 flex-1 overflow-y-auto p-3 pb-20 md:p-6 md:pb-6">
-            <PageTransition>{children}</PageTransition>
-          </main>
-
-          <BottomNav />
-        </SidebarInset>
-      </SSEProvider>
+        <BottomNav />
+      </SidebarInset>
     </SidebarProvider>
   );
 }

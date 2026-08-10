@@ -76,13 +76,17 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
       include: { user: { select: { id: true, name: true, avatar: true } } },
     });
 
-    // Broadcast via Pusher to the global comments channel
-    if (task) {
-      await pusherServer.trigger(`project-${taskId}`, 'comment:new', {
-        taskId,
-        comment,
-      });
-    }
+    // Broadcast via Pusher to the task-specific channel (for detail sheet)
+    await pusherServer.trigger(`project-${taskId}`, 'comment:new', {
+      taskId,
+      comment,
+    });
+
+    // ALSO broadcast to the global channel for task card counts
+    await pusherServer.trigger('global-comments', 'comment:new', {
+      taskId,
+      comment,
+    });
 
     return NextResponse.json(comment, { status: 201 });
   } catch (error) {

@@ -1,5 +1,6 @@
 import { auth } from '@/features/auth/auth-config';
 import { prisma } from '@/shared/lib/prisma';
+import { sendPusherNotification } from '@/shared/lib/pusher-notifications';
 import { pusherServer } from '@/shared/lib/pusher-server';
 import { NextResponse } from 'next/server';
 
@@ -76,12 +77,35 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
       include: { user: { select: { id: true, name: true, avatar: true } } },
     });
 
-    // Broadcast via Pusher to the global comments channel
-    if (task) {
-      await pusherServer.trigger(`project-${taskId}`, 'comment:new', {
-        taskId,
-        comment,
-      });
+    // existing broadcast to the task channel (used by the comment sheet)
+    await pusherServer.trigger(`project-${taskId}`, 'comment:new', {
+      taskId,
+      comment,
+    });
+
+    // NEW: also broadcast on the global channel so the comment count badge updates everywhere
+    await pusherServer.trigger('global-comments', 'comment:new', {
+      taskId,
+      comment,
+    });
+
+    // Notify task assignees & creator (except commenter)
+    const taskInfo = await prisma.task.findUnique({
+      where: { id: taskId },
+      select: { title: true, assignees: { select: { userId: true } }, creatorId: true },
+    });
+    if (taskInfo) {
+      const notifyUsers = new Set(taskInfo.assignees.map((a) => a.userId));
+      notifyUsers.add(taskInfo.creatorId);
+      notifyUsers.delete(session.user.id);
+      for (const uid of notifyUsers) {
+        await sendPusherNotification(uid, {
+          type: 'COMMENT_ADDED',
+          title: 'نظر جدید',
+          message: `نظر جدیدی روی تسک "${taskInfo.title}" ثبت شد`,
+          data: { taskId, projectId: task?.projectId || '' },
+        });
+      }
     }
 
     return NextResponse.json(comment, { status: 201 });

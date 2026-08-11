@@ -1,5 +1,6 @@
 import { auth } from '@/features/auth/auth-config';
 import { prisma } from '@/shared/lib/prisma';
+import { sendPusherNotification } from '@/shared/lib/pusher-notifications';
 import { sendSSENotification } from '@/shared/lib/sse';
 import { NextResponse } from 'next/server';
 
@@ -90,6 +91,14 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
 
     sendSSENotification({
       userId: user.id,
+      type: 'PROJECT_INVITE',
+      title: 'دعوت به پروژه',
+      message: `شما به پروژه "${projectName}" دعوت شدید`,
+      data: { projectId },
+    });
+
+    // NEW: Pusher notification
+    await sendPusherNotification(user.id, {
       type: 'PROJECT_INVITE',
       title: 'دعوت به پروژه',
       message: `شما به پروژه "${projectName}" دعوت شدید`,

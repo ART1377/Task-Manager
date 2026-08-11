@@ -6,6 +6,7 @@ import { MobileHeader } from '@/shared/components/mobile-header';
 import { PageTransition } from '@/shared/components/page-transition';
 import { SidebarInset, SidebarProvider } from '@/shared/components/ui/sidebar';
 import { ROUTES } from '@/shared/lib/routes';
+import { NotificationsProvider } from '@/shared/providers/notifications-provider';
 import { redirect } from 'next/navigation';
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -15,23 +16,25 @@ export default async function DashboardLayout({ children }: { children: React.Re
 
   return (
     <SidebarProvider>
-      <div className="hidden md:block">
-        <AppSidebar />
-      </div>
-
-      <SidebarInset>
+      <NotificationsProvider>
         <div className="hidden md:block">
-          <AppHeader user={session.user} />
+          <AppSidebar />
         </div>
 
-        <MobileHeader />
+        <SidebarInset>
+          <div className="hidden md:block">
+            <AppHeader user={session.user} />
+          </div>
 
-        <main className="bg-muted/10 flex-1 overflow-y-auto p-3 pb-20 md:p-6 md:pb-6">
-          <PageTransition>{children}</PageTransition>
-        </main>
+          <MobileHeader />
 
-        <BottomNav />
-      </SidebarInset>
+          <main className="bg-muted/10 flex-1 overflow-y-auto p-3 pb-20 md:p-6 md:pb-6">
+            <PageTransition>{children}</PageTransition>
+          </main>
+
+          <BottomNav />
+        </SidebarInset>
+      </NotificationsProvider>
     </SidebarProvider>
   );
 }

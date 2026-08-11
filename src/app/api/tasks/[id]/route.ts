@@ -1,6 +1,7 @@
 import { auth } from '@/features/auth/auth-config';
 import { TASK_STATUS_LABELS } from '@/shared/lib/constants';
 import { prisma } from '@/shared/lib/prisma';
+import { sendPusherNotification } from '@/shared/lib/pusher-notifications';
 import { sendSSENotification } from '@/shared/lib/sse';
 import { NextResponse } from 'next/server';
 
@@ -120,6 +121,14 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
             message: `وضعیت تسک "${existingTask.title}" به "${statusLabel}" تغییر کرد`,
             data: { taskId: id, projectId: task.projectId },
           });
+
+          // NEW: Pusher notification (works on Vercel)
+          await sendPusherNotification(assigneeId, {
+            type: 'TASK_UPDATED',
+            title: 'بروزرسانی تسک',
+            message: `وضعیت تسک "${existingTask.title}" به "${statusLabel}" تغییر کرد`,
+            data: { taskId: id, projectId: task.projectId },
+          });
         }
       }
     }
@@ -142,6 +151,14 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
 
           sendSSENotification({
             userId: assigneeId,
+            type: 'TASK_ASSIGNED',
+            title: 'تسک جدید',
+            message: `تسک "${task.title}" در پروژه "${task.project?.name || 'ناشناخته'}" به شما واگذار شد`,
+            data: { projectId: task.projectId, taskId: task.id },
+          });
+
+          // NEW: Pusher notification
+          await sendPusherNotification(assigneeId, {
             type: 'TASK_ASSIGNED',
             title: 'تسک جدید',
             message: `تسک "${task.title}" در پروژه "${task.project?.name || 'ناشناخته'}" به شما واگذار شد`,

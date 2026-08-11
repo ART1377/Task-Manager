@@ -1,5 +1,6 @@
 import { auth } from '@/features/auth/auth-config';
 import { prisma } from '@/shared/lib/prisma';
+import { sendPusherNotification } from '@/shared/lib/pusher-notifications';
 import { sendSSENotification } from '@/shared/lib/sse';
 import type { Prisma } from '@prisma/client';
 import { NextResponse } from 'next/server';
@@ -151,7 +152,15 @@ export async function POST(request: Request) {
             type: 'TASK_ASSIGNED',
             title: 'تسک جدید',
             message: `تسک "${task.title}" در پروژه "${task.project?.name || 'ناشناخته'}" به شما واگذار شد`,
-            data: { projectId, taskId: task.id },
+            data: { projectId: task.projectId, taskId: task.id },
+          });
+
+          // NEW: Pusher notification
+          await sendPusherNotification(assigneeId, {
+            type: 'TASK_ASSIGNED',
+            title: 'تسک جدید',
+            message: `تسک "${task.title}" در پروژه "${task.project?.name || 'ناشناخته'}" به شما واگذار شد`,
+            data: { projectId: task.projectId, taskId: task.id },
           });
         }
       }

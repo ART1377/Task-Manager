@@ -1,4 +1,3 @@
-import { SSEProvider } from '@/features/notifications/components/sse-provider';
 import { ToastConfig } from '@/shared/components/toast-config';
 import { TooltipProvider } from '@/shared/components/ui/tooltip';
 import { AuthProvider } from '@/shared/providers/auth-provider';
@@ -42,9 +41,7 @@ export default function RootLayout({
           <QueryProvider>
             <AuthProvider>
               <PresenceProvider>
-                <SSEProvider>
-                  <TooltipProvider>{children}</TooltipProvider>
-                </SSEProvider>
+                <TooltipProvider>{children}</TooltipProvider>
               </PresenceProvider>
               <ToastConfig />
             </AuthProvider>

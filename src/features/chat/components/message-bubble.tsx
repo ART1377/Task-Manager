@@ -22,8 +22,6 @@ interface MessageBubbleProps {
   onLongPress?: (id: string) => void;
   onCopy?: (content: string) => void;
   readBy?: string[];
-  /** Registers this message's DOM node so it's marked read once actually
-   * scrolled into view. Only meaningful for messages from OTHER users. */
   registerMessageElement?: (messageId: string, el: HTMLElement | null) => void;
 }
 
@@ -76,7 +74,7 @@ export function MessageBubble({
           if (!selectMode) onLongPress?.(message.id);
         }}
         className={cn(
-          'group/bubble relative w-fit max-w-[75%] rounded-2xl px-3.5 py-2 transition-colors duration-700',
+          'group/bubble relative w-fit max-w-[75%] min-w-30 rounded-2xl px-3.5 py-2 transition-colors duration-700',
           isOwn
             ? 'bg-primary text-primary-foreground rounded-br-md'
             : 'bg-muted mr-auto rounded-bl-md',

@@ -28,6 +28,9 @@ export const metadata: Metadata = {
     type: 'website',
     locale: 'fa_IR',
   },
+  icons: {
+    icon: '/favicon.ico',
+  },
 };
 export default function RootLayout({
   children,
